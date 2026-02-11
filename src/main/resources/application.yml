@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: ai-personal-os
+
+langchain4j:
+  google-ai-gemini:
+    chat-model:
+      api-key: ${GEMINI_API_KEY:}
+      model-name: ${GEMINI_MODEL:gemini-2.5-flash}

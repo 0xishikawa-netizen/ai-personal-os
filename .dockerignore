@@ -1,0 +1,23 @@
+cat > .dockerignore <<'EOF'
+# Node / frontend / mobile
+frontend/
+mobile/
+**/node_modules/
+**/.next/
+**/dist/
+**/.expo/
+**/.turbo/
+
+# Java/Gradle build outputs
+build/
+**/build/
+.gradle/
+
+# VCS / IDE
+.git/
+.vscode/
+.DS_Store
+
+# logs
+*.log
+EOF

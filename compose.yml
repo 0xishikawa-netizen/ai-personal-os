@@ -1,0 +1,10 @@
+services:
+  api:
+    build: .
+    container_name: personal-os-api
+    env_file:
+      - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
