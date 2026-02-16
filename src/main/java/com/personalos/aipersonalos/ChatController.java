@@ -3,17 +3,35 @@ package com.personalos.aipersonalos;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/chat")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class ChatController {
 
-    private final ChatLanguageModel chatLanguageModel;
+	private final ChatLanguageModel chatLanguageModel;
+	private final ChatMessageRepository repository;
 
-    @GetMapping
-    public String chat(@RequestParam(value = "message", defaultValue = "自己紹介してください") String message) {
-        return chatLanguageModel.generate(message);
-    }
+	// チャット送信
+	@GetMapping
+	public String chat(@RequestParam String message) {
+		// 1. ユーザーの発言を保存
+		repository.save(new ChatMessage(null, "user", message));
+
+		// 2. AIの回答を生成
+		String response = chatLanguageModel.generate(message);
+
+		// 3. AIの回答を保存
+		repository.save(new ChatMessage(null, "ai", response));
+
+		return response;
+	}
+
+	// 履歴取得
+	@GetMapping("/history")
+	public List<ChatMessage> getHistory() {
+		return repository.findAll();
+	}
 }

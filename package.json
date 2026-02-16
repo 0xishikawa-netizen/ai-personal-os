@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "mobile"
+  ],
+  "scripts": {
+    "lint": "npm -w frontend run lint && npm -w mobile run lint",
+    "lint:fix": "npm -w frontend run lint:fix && npm -w mobile run lint:fix",
+    "format": "npm -w frontend run format && npm -w mobile run format",
+    "format:check": "npm -w frontend run format:check && npm -w mobile run format:check"
+  }
+}

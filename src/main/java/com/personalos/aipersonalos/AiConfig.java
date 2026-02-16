@@ -9,14 +9,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AiConfig {
 
-    @Bean
-    ChatLanguageModel chatLanguageModel(
-            @Value("${langchain4j.google-ai-gemini.chat-model.api-key}") String apiKey,
-            @Value("${langchain4j.google-ai-gemini.chat-model.model-name}") String modelName
-    ) {
-        return GoogleAiGeminiChatModel.builder()
-                .apiKey(apiKey)
-                .modelName(modelName)
-                .build();
-    }
+	@Bean
+	ChatLanguageModel chatLanguageModel(@Value("${langchain4j.google-ai-gemini.chat-model.api-key}") String apiKey,
+			@Value("${langchain4j.google-ai-gemini.chat-model.model-name}") String modelName) {
+		return GoogleAiGeminiChatModel.builder().apiKey(apiKey).modelName(modelName).build();
+	}
 }
