@@ -1,10 +1,37 @@
 services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    # ホストの 5432 が他プロジェクトとぶつかる場合があるため 5433 を公開（api→db は内部 5432 のまま）
+    ports:
+      - '5433:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 3s
+      timeout: 3s
+      retries: 5
+    networks:
+      - internal
+
   api:
     build: .
-    container_name: personal-os-api
-    env_file:
-      - .env
+    container_name: kairos-api
+    env_file: .env
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      # env_file の DB_URL と揃え、コンテナ間はサービス名 db で解決（専用ネットワーク必須）
+      DB_URL: jdbc:postgresql://db:5432/postgres
     ports:
-      - "8080:8080"
+      - '8080:8080'
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge

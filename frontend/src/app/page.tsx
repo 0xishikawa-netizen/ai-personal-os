@@ -1,58 +1,79 @@
 'use client';
-import { useState, useEffect } from 'react';
 
-export default function Home() {
-  const [message, setMessage] = useState('');
-  const [chatLog, setChatLog] = useState<{ role: string; content: string }[]>([]);
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { getIsLoggedIn, setLoggedIn } from './dashboard/DashboardShell';
 
-  // 起動時にDBから過去の全履歴を読み込む（同期）
+export default function LoginPage() {
+  const router = useRouter();
+
   useEffect(() => {
-    fetch('http://localhost:8080/api/chat/history')
-      .then((res) => res.json())
-      .then((data) => setChatLog(data))
-      .catch((err) => console.error('履歴の取得に失敗しました', err));
-  }, []);
+    if (getIsLoggedIn()) {
+      router.replace('/dashboard');
+    }
+  }, [router]);
 
-  const sendMessage = async () => {
-    if (!message) return;
-    setChatLog((prev) => [...prev, { role: 'user', content: message }]);
-    const currentMsg = message;
-    setMessage('');
-
-    const res = await fetch(
-      `http://localhost:8080/api/chat?message=${encodeURIComponent(currentMsg)}`,
-    );
-    const data = await res.text();
-    setChatLog((prev) => [...prev, { role: 'ai', content: data }]);
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoggedIn(true);
+    router.replace('/dashboard');
   };
 
   return (
-    <main className="p-10 max-w-4xl mx-auto min-h-screen bg-gray-50">
-      <h1 className="text-3xl font-bold mb-8 text-blue-600">AI Personal OS - Dashboard</h1>
-      <div className="bg-white rounded-xl shadow-sm border p-6 h-[600px] overflow-y-auto mb-6">
-        {chatLog.map((log, i) => (
-          <div
-            key={i}
-            className={`mb-4 flex ${log.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
-            <div
-              className={`p-3 rounded-lg ${log.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-black'}`}
-            >
-              {log.content}
-            </div>
+    <main className="min-h-screen min-h-[100dvh] flex items-center justify-center p-6 md:p-10">
+      <div className="w-full max-w-[420px]">
+        <div className="text-center mb-8">
+          <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-soft)] text-[#0a0c0e] shadow-xl shadow-[var(--accent-glow)] mb-5">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+              <circle cx="12" cy="12" r="3" />
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2" />
+            </svg>
           </div>
-        ))}
-      </div>
-      <div className="flex gap-2">
-        <input
-          className="flex-1 border p-3 rounded-lg text-black"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="PCから入力..."
-        />
-        <button className="bg-blue-600 text-white px-8 py-3 rounded-lg" onClick={sendMessage}>
-          送信
-        </button>
+          <h1 className="text-2xl md:text-[1.65rem] font-semibold tracking-tight text-[var(--foreground)]">
+            Kairos
+          </h1>
+          <p className="mt-2 text-sm text-[var(--muted)] leading-relaxed">
+            ログインしてダッシュボードとチャットを利用します
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/80 backdrop-blur-xl p-8 shadow-[var(--card-shadow)]">
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div className="space-y-1.5">
+              <label htmlFor="email" className="block text-xs font-medium uppercase tracking-wider text-[var(--muted)]">
+                メールアドレス
+              </label>
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                className="w-full rounded-xl border border-[var(--border)] bg-[var(--background)]/60 px-4 py-3 text-[var(--foreground)] placeholder:text-[var(--muted)]/70 outline-none transition-shadow focus:border-[var(--accent)]/50 focus:ring-2 focus:ring-[var(--accent-glow)]"
+                placeholder="you@example.com"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label htmlFor="password" className="block text-xs font-medium uppercase tracking-wider text-[var(--muted)]">
+                パスワード
+              </label>
+              <input
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                className="w-full rounded-xl border border-[var(--border)] bg-[var(--background)]/60 px-4 py-3 text-[var(--foreground)] placeholder:text-[var(--muted)]/70 outline-none transition-shadow focus:border-[var(--accent)]/50 focus:ring-2 focus:ring-[var(--accent-glow)]"
+                placeholder="••••••••"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full rounded-xl bg-gradient-to-r from-[var(--accent)] to-[var(--accent-soft)] py-3.5 text-sm font-semibold text-[#0a0c0e] shadow-lg shadow-[var(--accent-glow)] transition-all hover:brightness-110 hover:shadow-xl active:scale-[0.99]"
+            >
+              ログイン
+            </button>
+          </form>
+          <p className="mt-6 text-center text-xs text-[var(--muted)] leading-relaxed">
+            デモ環境のため、入力内容に関係なくログインできます。
+          </p>
+        </div>
       </div>
     </main>
   );

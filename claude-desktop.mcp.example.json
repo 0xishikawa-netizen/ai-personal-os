@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "kairos": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/あなたのユーザー名/developer/kairos"
+      ]
+    }
+  }
+}

@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "mobile",
-    "slug": "mobile",
+    "name": "Kairos",
+    "slug": "kairos",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "mobile",
+    "scheme": "kairos",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",

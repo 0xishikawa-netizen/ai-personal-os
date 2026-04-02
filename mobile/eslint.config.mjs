@@ -24,9 +24,29 @@ export default [
   js.configs.recommended,
   ...tseslint.configs.recommended,
 
-  // React / RN
+  // Node 用設定ファイル（Metro / Babel など）
+  {
+    files: ['metro.config.js', 'babel.config.js'],
+    languageOptions: {
+      sourceType: 'commonjs',
+      globals: {
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        module: 'readonly',
+        require: 'readonly',
+        exports: 'writable',
+        process: 'readonly',
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
+
+  // React / RN（Metro 等の Node 設定ファイルは除外）
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
+    ignores: ['metro.config.js', 'babel.config.js'],
     plugins: {
       react,
       'react-hooks': reactHooks,

@@ -1,26 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import 'tailwindcss';
 
+/*
+  Kairos — 統一デザイントークン（Web / チャット / ダッシュボード共通）
+  目に優しいダーク + セージアクセント
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #080a0e;
+  --foreground: #e9eaee;
+  --muted: #8b919f;
+  --muted-2: #5c6370;
+  --bubble: #12151c;
+  --bubble-user: #1a2330;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.12);
+  --accent: #7eb8a3;
+  --accent-soft: #5a957f;
+  --accent-glow: rgba(126, 184, 163, 0.28);
+  --accent-muted: rgba(126, 184, 163, 0.12);
+  --surface: #0f1218;
+  --surface-elevated: #161a24;
+  --sidebar: #0c0e14;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --card-shadow: 0 12px 48px rgba(0, 0, 0, 0.45);
+
+  /* chat.css 互換（チャット専用スタイル用エイリアス） */
+  --bg: var(--background);
+  --bg-surface: #11141b;
+  --bg-elevated: var(--surface-elevated);
+  --text: var(--foreground);
+  --text-muted: var(--muted);
+  --text-dim: var(--muted-2);
+  --bubble-user-border: rgba(126, 184, 163, 0.2);
+  --bubble-ai: #13161d;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --font-sans: 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --shadow-md: var(--card-shadow);
+  --inline-code-color: #fe8181;
+  --inline-code-bg: rgba(194, 192, 182, 0.05);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
+  margin: 0;
+  min-height: 100dvh;
   background: var(--background);
+  background-image:
+    radial-gradient(ellipse 120% 80% at 50% -30%, rgba(126, 184, 163, 0.09), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 100% 0%, rgba(90, 120, 180, 0.06), transparent 45%),
+    radial-gradient(ellipse 50% 40% at 0% 100%, rgba(126, 184, 163, 0.05), transparent 50%);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent-muted);
+  color: var(--foreground);
 }

@@ -1,4 +1,4 @@
-package com.personalos.aipersonalos;
+package com.kairos;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

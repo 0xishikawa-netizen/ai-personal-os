@@ -1,31 +1,33 @@
 #!/bin/zsh
 
-echo " Starting AI Personal OS..."
+echo "🚀 Starting Kairos..."
 
-BASE_DIR="/Users/ishikawatatsuya/developer/ai-personal-os"
+BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$BASE_DIR" || exit 1
 
-cd $BASE_DIR
+if ! docker info &>/dev/null; then
+  echo "❌ Docker が起動していません。"
+  exit 1
+fi
 
-# ----------------------
-# Backend (Docker)
-# ----------------------
+# Backend
 echo "▶ Backend starting..."
-docker compose up -d --build
+if docker compose ps --status running | grep -q "api"; then
+  docker compose restart api
+else
+  docker compose up -d --build
+fi
 
-# ----------------------
-# Frontend (Next.js)
-# ----------------------
+# Frontend
 echo "▶ Frontend starting..."
 osascript -e 'tell application "Terminal"
     do script "cd '"$BASE_DIR"'/frontend && npm run dev"
 end tell'
 
-# ----------------------
-# Mobile (Expo)
-# ----------------------
+# Mobile
 echo "▶ Mobile starting..."
 osascript -e 'tell application "Terminal"
     do script "cd '"$BASE_DIR"'/mobile && npx expo start"
 end tell'
 
-echo "All services launched!"
+echo "✅ Done! API: http://localhost:8080"

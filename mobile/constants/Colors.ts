@@ -1,19 +1,20 @@
-const tintColorLight = '#2f95dc';
-const tintColorDark = '#fff';
+import { AppColors } from './theme';
+
+const tint = AppColors.accent;
 
 export default {
   light: {
-    text: '#000',
-    background: '#fff',
-    tint: tintColorLight,
-    tabIconDefault: '#ccc',
-    tabIconSelected: tintColorLight,
+    text: AppColors.foreground,
+    background: AppColors.background,
+    tint,
+    tabIconDefault: AppColors.muted,
+    tabIconSelected: tint,
   },
   dark: {
-    text: '#fff',
-    background: '#000',
-    tint: tintColorDark,
-    tabIconDefault: '#ccc',
-    tabIconSelected: tintColorDark,
+    text: AppColors.foreground,
+    background: AppColors.background,
+    tint,
+    tabIconDefault: AppColors.muted,
+    tabIconSelected: tint,
   },
 };

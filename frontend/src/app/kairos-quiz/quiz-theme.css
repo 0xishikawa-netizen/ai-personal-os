@@ -1,0 +1,28 @@
+/* 問題集 — ダッシュボード / サイドバーと同じトークン（globals.css）に揃える */
+.quiz-theme {
+  --quiz-page-bg: var(--background);
+  --quiz-card-bg: var(--surface-elevated);
+  --quiz-card-border: rgba(255, 255, 255, 0.1);
+  --quiz-accent: var(--accent);
+  --quiz-accent-soft: var(--accent);
+  --quiz-accent-bright: var(--foreground);
+  --quiz-accent-dim: var(--accent-muted);
+  --quiz-accent-glow: var(--accent-glow);
+  --quiz-divider: var(--sidebar-border);
+  /* 難易度はアクセント系の星（ゴールドはやめてトーン統一） */
+  --quiz-star: var(--accent);
+  --quiz-star-dim: rgba(126, 184, 163, 0.22);
+  --quiz-correct: #34d399;
+  --quiz-correct-bg: rgba(52, 211, 153, 0.12);
+  --quiz-wrong: #f87171;
+  --quiz-wrong-bg: rgba(248, 113, 113, 0.1);
+  --quiz-muted: var(--muted);
+  --quiz-choice-bg: var(--bg-surface);
+  --quiz-border: rgba(126, 184, 163, 0.22);
+  --quiz-on-accent: #0a0c0e;
+}
+
+.kairos-quiz-shell {
+  background-color: var(--quiz-page-bg);
+  min-height: 100%;
+}

@@ -1,9 +1,18 @@
 {
+  "name": "kairos",
   "private": true,
   "workspaces": [
     "frontend",
     "mobile"
   ],
+  "devDependencies": {
+    "expo-router": "~6.0.23"
+  },
+  "overrides": {
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-test-renderer": "19.1.0"
+  },
   "scripts": {
     "lint": "npm -w frontend run lint && npm -w mobile run lint",
     "lint:fix": "npm -w frontend run lint:fix && npm -w mobile run lint:fix",

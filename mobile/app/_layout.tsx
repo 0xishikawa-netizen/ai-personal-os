@@ -1,12 +1,14 @@
+import 'react-native-gesture-handler';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DarkTheme, ThemeProvider } from '@react-navigation/native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import 'react-native-reanimated';
 
-import { useColorScheme } from '@/components/useColorScheme';
+import { AppColors } from '@/constants/theme';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -14,8 +16,7 @@ export {
 } from 'expo-router';
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
+  initialRouteName: '(drawer)',
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -46,14 +47,30 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
+  const navigationTheme = useMemo(
+    () => ({
+      ...DarkTheme,
+      colors: {
+        ...DarkTheme.colors,
+        primary: AppColors.accent,
+        background: AppColors.background,
+        card: AppColors.surfaceElevated,
+        text: AppColors.foreground,
+        border: 'rgba(255,255,255,0.08)',
+        notification: AppColors.accent,
+      },
+    }),
+    [],
+  );
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider value={navigationTheme}>
+        <Stack>
+          <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        </Stack>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

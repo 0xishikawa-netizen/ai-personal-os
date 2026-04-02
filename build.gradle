@@ -5,9 +5,9 @@ plugins {
     id 'org.springframework.boot' version '4.0.2'
 }
 
-group = 'com.personalos'
+group = 'com.kairos'
 version = '0.0.1-SNAPSHOT'
-description = 'AI Personal OS (Spring Boot)'
+description = 'Kairos (Spring Boot)'
 
 java {
     toolchain {
@@ -30,14 +30,20 @@ dependencies {
 
     // Web/API
     implementation "org.springframework.boot:spring-boot-starter-web"
+    // Quiz 等が com.fasterxml.jackson.databind.ObjectMapper を使うため（Boot 4 既定は Jackson 3 の JsonMapper）
+    implementation "org.springframework.boot:spring-boot-jackson2"
 
     // JPA
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
 
+    // スキーマ（クイズ用テーブルは Flyway で作成）
+    implementation "org.springframework.boot:spring-boot-starter-flyway"
+    runtimeOnly "org.flywaydb:flyway-database-postgresql"
+
     // DB driver
     runtimeOnly "org.postgresql:postgresql"
 
-    // LangChain4j
+    // LangChain4j（0.36.x BOM には Gemini 用 spring-boot-starter が無い → ChatLanguageModel は AiConfig で定義）
     implementation "dev.langchain4j:langchain4j-pgvector"
     implementation "dev.langchain4j:langchain4j-google-ai-gemini"
 
@@ -56,4 +62,8 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+springBoot {
+    mainClass = 'com.kairos.KairosApplication'
 }

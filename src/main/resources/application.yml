@@ -1,6 +1,22 @@
 spring:
   application:
-    name: ai-personal-os
+    name: kairos
+
+  # 既定はホスト直実行用（localhost）。Docker の api は .env の DB_URL で db:5432 に上書きする。
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/postgres}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
 
 langchain4j:
   google-ai-gemini:

@@ -1,5 +1,6 @@
-package com.personalos.aipersonalos;
+package com.kairos;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,9 +14,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatMessage {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	private String role; // "user" か "ai"
-	private String content; // 発言内容
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String role;
+
+    @Column(columnDefinition = "TEXT")
+    private String content;
 }

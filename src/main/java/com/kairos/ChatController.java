@@ -1,4 +1,4 @@
-package com.personalos.aipersonalos;
+package com.kairos;
 
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +8,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/chat")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class ChatController {
 
 	private final ChatLanguageModel chatLanguageModel;
