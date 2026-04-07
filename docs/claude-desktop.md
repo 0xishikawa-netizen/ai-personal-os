@@ -1,51 +1,96 @@
-はい、マークダウンなしのテキストでまとめます。
+# Claude Desktop で MCP を繋ぐ手順（kairos のみ）
 
----
+Claude Desktop に MCP（Model Context Protocol）の **filesystem** サーバーを登録すると、チャットからこのリポジトリ内のファイルを読み書きできます。
 
-Claude Desktop とプロジェクトを連携する
+## 前提
 
-MCP（Model Context Protocol）の Filesystem サーバーを使うことで、Claude Desktop からこのフォルダ内のファイルを読み書きできます。
+- [Claude Desktop](https://claude.ai/download) がインストール済み
+- Node.js が入り、ターミナルで `npx --version` が通ること
 
-前提条件として、Claude Desktop がインストール済みであること、Node.js が入っていて npx --version がターミナルで通ることを確認してください。
+## 手順
 
-セットアップ手順
+### 1. 設定ファイルを開く
 
-1. 設定ファイルを開く
+1. **Claude Desktop** を起動する  
+2. メニュー **Claude → Settings…**（設定）  
+3. **Developer** を開く  
+4. **Edit Config** をクリックする  
 
-Claude Desktop を起動し、メニューバーから Claude → Settings… を開きます。Developer タブを選択し、Edit Config をクリックすると claude_desktop_config.json がエディタで開きます。
+エディタで `claude_desktop_config.json` が開きます。
 
-2. MCP サーバーを追加する
+**直接開く場合（macOS）**
 
-以下の内容を参考に mcpServers を追加してください。パスはこのリポジトリの実際の場所に書き換えてください。
+- パス: `~/Library/Application Support/Claude/claude_desktop_config.json`  
+- Finder で **移動 → フォルダへ移動** に上記を貼り付けても開けます。
 
-    {
-      "mcpServers": {
-        "kairos": {
-          "command": "npx",
-          "args": [
-            "-y",
-            "@modelcontextprotocol/server-filesystem",
-            "/Users/あなたのユーザー名/developer/kairos"
-          ]
-        }
-      }
+### 2. JSON の形を確認する
+
+トップレベルは有効な JSON にします。
+
+```json
+{
+  "mcpServers": { },
+  "preferences": { }
+}
+```
+
+- **`preferences`**: Claude Desktop の UI 設定（任意）。リポジトリの例ファイルと同じ内容でよいです。  
+すでに `mcpServers` がある場合は、`kairos` のエントリだけ**追記**し、カンマで区切って JSON が壊れないようにしてください。
+
+### 3. `kairos` を書き込む
+
+リポジトリ直下の **`claude-desktop.mcp.example.json`** の内容をコピーし、`claude_desktop_config.json` の `mcpServers` にマージします。
+
+**必ず直す箇所**: `kairos` の `args` の**最後の要素**を、このリポジトリの**実際の絶対パス**に変更する（例: `/Users/あなたの名前/developer/kairos`）。
+
+**例（`kairos` + `preferences`）**
+
+```json
+{
+  "mcpServers": {
+    "kairos": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/ishikawatatsuya/developer/kairos"
+      ]
     }
+  },
+  "preferences": {
+    "coworkScheduledTasksEnabled": false,
+    "ccdScheduledTasksEnabled": false,
+    "sidebarMode": "chat",
+    "coworkWebSearchEnabled": true
+  }
+}
+```
 
-既に別の mcpServers がある場合は、"kairos": { ... } の部分だけを既存のオブジェクト内に追記し、設定全体を上書きしないよう注意してください。
+### 4. 保存して Claude を再起動
 
-3. Claude Desktop を再起動する
+1. `claude_desktop_config.json` を保存（JSON の文法ミスがないか確認）  
+2. メニューバーの **Claude → Quit** で**完全終了**  
+3. 再度 **Claude Desktop** を起動  
 
-Claude Desktop をメニューバーのアイコンから完全に終了し、再度起動します。
+### 5. 繋がったか確認する
 
-4. 動作確認
+新しいチャットを開き、ツール一覧に **filesystem** 系（`read_file` / `write_file` など）が **`kairos` 経由**で出ていれば成功です。Developer タブに MCP の状態やログがあれば、エラーがないかも確認してください。
 
-新しいチャットを開き、ツール一覧に kairos または filesystem 系のツールが表示されていれば成功です。
+## うまくいかないとき
 
-注意事項
+| 症状 | 確認すること |
+|------|----------------|
+| ツールが出ない | JSON の文法、`mcpServers` のキー、**完全終了→再起動** |
+| npx が失敗 | ターミナルで `npx -y @modelcontextprotocol/server-filesystem --help`、ネットワーク |
+| パス違い | `args` の最後がリポジトリの実パスと一致しているか |
 
-.env ファイルにはAPIキーなどの秘密情報が含まれます。Claude に渡したくない場合は、MCP の許可パスをサブディレクトリに限定するか、.env の内容を会話に貼らないようにしてください。リポジトリルートの CLAUDE.md にプロジェクト概要が書かれています。作業開始時に Claude に読ませると文脈を把握しやすくなります。
+## 注意（秘密情報）
 
-参考リンク
+`.env` に API キーなどが入ります。MCP でリポジトリ全体を許可していると Claude がファイルを読めます。必要なら許可パスをサブフォルダに限定するか、`.env` を会話に貼らないようにしてください。
 
-MCP Filesystem サーバー: https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem
-設定ファイルの場所（macOS）: ~/Library/Application Support/Claude/claude_desktop_config.json
+プロジェクト概要はリポジトリルートの **`CLAUDE.md`** にあります。
+
+## 参考リンク
+
+- MCP Filesystem サーバー: https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem  
+- 設定ファイル（macOS）: `~/Library/Application Support/Claude/claude_desktop_config.json`  

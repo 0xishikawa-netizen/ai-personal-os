@@ -12,8 +12,8 @@
 
 ## 起動（開発）
 
-- **一括**: ルートの `start-all.command`（macOS）。既定は同梱 PostgreSQL（`docker compose --profile local-db`）。`.env` に `db:5432` が必要。
-- **API のみ**: `docker compose --profile local-db up -d`（ローカル DB）または `USE_BUNDLED_POSTGRES=0` で外部 DB のみ。
+- **一括**: ルートの `start-all.command`（macOS）。API は **ホストの Postgres（DBeaver と同じ `localhost:5432`）** を `.env` の `DB_URL=jdbc:postgresql://host.docker.internal:5432/...` で参照。
+- **同梱 Postgres が必要なとき**: `docker compose --profile bundled-db up -d`（ホストからは `localhost:5433`）。その場合 `.env` は `DB_URL=jdbc:postgresql://db:5432/postgres`。
 - **フロント**: `frontend/` で `npm run dev`（ポート 3000/3001）。
 - **モバイル**: `mobile/` で `npx expo start`。
 

@@ -20,7 +20,10 @@ spring:
 
   flyway:
     enabled: true
+    # Supabase 等で public に既存オブジェクトがあると baseline-on-migrate が走る。
+    # baseline-version の既定 1 だと V1 が「適用済み」扱いでスキップされ、V2 が先に失敗する（quiz_question 不在）。
     baseline-on-migrate: true
+    baseline-version: 0
     locations: classpath:db/migration
 
 # ブラウザが API を直叩きするときのみ有効。Vercel の Route Handler 経由なら上流はサーバー間通信で CORS は基本不要。

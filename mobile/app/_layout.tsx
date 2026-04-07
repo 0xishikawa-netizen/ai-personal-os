@@ -1,14 +1,12 @@
 import 'react-native-gesture-handler';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, ThemeProvider } from '@react-navigation/native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-reanimated';
-
-import { AppColors } from '@/constants/theme';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -47,30 +45,14 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const navigationTheme = useMemo(
-    () => ({
-      ...DarkTheme,
-      colors: {
-        ...DarkTheme.colors,
-        primary: AppColors.accent,
-        background: AppColors.background,
-        card: AppColors.surfaceElevated,
-        text: AppColors.foreground,
-        border: 'rgba(255,255,255,0.08)',
-        notification: AppColors.accent,
-      },
-    }),
-    [],
-  );
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider value={navigationTheme}>
+      <SafeAreaProvider>
         <Stack>
           <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         </Stack>
-      </ThemeProvider>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }

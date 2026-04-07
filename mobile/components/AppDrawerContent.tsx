@@ -1,20 +1,16 @@
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  Pressable,
-  Alert,
-} from 'react-native';
-import { DrawerContentScrollView, DrawerContentComponentProps } from '@react-navigation/drawer';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { DrawerContentScrollView, type DrawerContentComponentProps } from '@react-navigation/drawer';
 import { router, usePathname } from 'expo-router';
-import { AppColors } from '@/constants/theme';
+
+import { AppColors, Radii, shadowAccent } from '@/constants/theme';
 
 export function AppDrawerContent(props: DrawerContentComponentProps) {
   const { navigation } = props;
   const pathname = usePathname();
   const isChat = pathname === '/chat' || pathname.endsWith('/chat');
-  const isHome = !isChat;
+  const isQuiz = pathname === '/quiz' || pathname.startsWith('/quiz/');
+  const isHome = !isChat && !isQuiz;
 
   const close = () => navigation.closeDrawer();
 
@@ -28,17 +24,21 @@ export function AppDrawerContent(props: DrawerContentComponentProps) {
     close();
   };
 
+  const goQuiz = () => {
+    router.push('/quiz');
+    close();
+  };
+
   const logout = () => {
     close();
-    Alert.alert('ログアウト', 'モバイルアプリではセッションは端末内のみです。Web と同じログイン連携は今後の予定です。');
+    Alert.alert(
+      'ログアウト',
+      'モバイルアプリではセッションは端末内のみです。Web と同じログイン連携は今後の予定です。',
+    );
   };
 
   return (
-    <DrawerContentScrollView
-      {...props}
-      contentContainerStyle={styles.scroll}
-      style={styles.drawer}
-    >
+    <DrawerContentScrollView {...props} contentContainerStyle={styles.scroll} style={styles.drawer}>
       <View style={styles.brand}>
         <View style={styles.logoMark}>
           <Text style={styles.logoGlyph}>✦</Text>
@@ -54,14 +54,21 @@ export function AppDrawerContent(props: DrawerContentComponentProps) {
           onPress={goHome}
           style={({ pressed }) => [styles.navItem, isHome && styles.navItemActive, pressed && styles.pressed]}
         >
-          <Text style={[styles.navIcon]}>⌂</Text>
+          <Text style={styles.navIcon}>⌂</Text>
           <Text style={[styles.navLabel, isHome && styles.navLabelActive]}>ホーム</Text>
+        </Pressable>
+        <Pressable
+          onPress={goQuiz}
+          style={({ pressed }) => [styles.navItem, isQuiz && styles.navItemActive, pressed && styles.pressed]}
+        >
+          <Text style={styles.navIcon}>📚</Text>
+          <Text style={[styles.navLabel, isQuiz && styles.navLabelActive]}>問題集</Text>
         </Pressable>
         <Pressable
           onPress={goChat}
           style={({ pressed }) => [styles.navItem, isChat && styles.navItemActive, pressed && styles.pressed]}
         >
-          <Text style={[styles.navIcon]}>💬</Text>
+          <Text style={styles.navIcon}>💬</Text>
           <Text style={[styles.navLabel, isChat && styles.navLabelActive]}>チャット</Text>
         </Pressable>
       </View>
@@ -82,93 +89,96 @@ const styles = StyleSheet.create({
   },
   scroll: {
     flexGrow: 1,
-    paddingTop: 8,
-    paddingBottom: 24,
+    paddingTop: 12,
+    paddingBottom: 28,
   },
   brand: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: AppColors.sidebarBorder,
-    marginBottom: 8,
+    gap: 14,
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+    marginHorizontal: 10,
+    marginBottom: 12,
+    borderRadius: Radii.lg,
+    borderWidth: 1,
+    borderColor: AppColors.hairline,
+    backgroundColor: 'rgba(255,255,255,0.03)',
   },
   logoMark: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
+    width: 40,
+    height: 40,
+    borderRadius: Radii.md,
     backgroundColor: AppColors.accent,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: AppColors.accent,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.35,
-    shadowRadius: 8,
-    elevation: 4,
+    ...shadowAccent,
   },
   logoGlyph: {
-    fontSize: 18,
-    color: '#0a0c0e',
+    fontSize: 20,
+    color: AppColors.onAccent,
     fontWeight: '700',
   },
   brandTitle: {
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: 17,
+    fontWeight: '700',
     color: AppColors.foreground,
+    letterSpacing: -0.2,
   },
   brandSub: {
-    fontSize: 11,
+    fontSize: 12,
     color: AppColors.muted,
-    marginTop: 2,
+    marginTop: 3,
   },
   nav: {
-    paddingHorizontal: 8,
-    gap: 4,
+    paddingHorizontal: 10,
+    gap: 6,
   },
   navItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    borderRadius: 12,
+    gap: 14,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderRadius: Radii.md,
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
   navItemActive: {
     backgroundColor: AppColors.accentMuted,
+    borderColor: AppColors.quizBorder,
   },
   pressed: {
-    opacity: 0.85,
+    opacity: 0.88,
   },
   navIcon: {
-    fontSize: 16,
-    width: 22,
+    fontSize: 17,
+    width: 26,
     textAlign: 'center',
   },
   navLabel: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '500',
     color: AppColors.foreground,
   },
   navLabelActive: {
     color: AppColors.accent,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   footer: {
     marginTop: 'auto',
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingHorizontal: 18,
+    paddingTop: 20,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: AppColors.sidebarBorder,
   },
   logout: {
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderRadius: Radii.md,
   },
   logoutText: {
     fontSize: 14,
-    color: AppColors.muted,
+    color: AppColors.muted2,
   },
 });

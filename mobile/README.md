@@ -17,6 +17,24 @@
 
 `app.json` の `newArchEnabled` は、レンダラー周りの不具合を避けるため **false** にしています。ネイティブを既に新アーキでビルドしている場合は、`npx expo prebuild --clean` 後に iOS/Android を作り直してください。
 
+## ナビゲーション: `Couldn't register the navigator`
+
+モノレポで `@react-navigation/native` が **2 バージョン**（例: expo-router 経由の 7.1.x と mobile の 7.2.x）に分かれると、エラーメッセージに出る **multiple copies** の状態になり、`NavigationContainer` のコンテキストが壊れます。ルート `package.json` の **`overrides`** で `@react-navigation/native` / `@react-navigation/elements` を **1 本に揃えたうえで**、リポジトリルートで `npm install` し直してください（`npx expo start --clear` 推奨）。
+
+## API の向き先（チャット・問題集）
+
+既定は `http://127.0.0.1:8080`（シミュレータ / エミュレータ向け）です。**実機**から PC 上の Spring Boot に繋ぐときは、プロジェクトルートまたは `mobile/` に `.env` を置き、LAN IP を指定してください。
+
+```bash
+EXPO_PUBLIC_API_BASE_URL=http://192.168.1.10:8080
+```
+
+`npx expo start` を**再起動**すると反映されます。チャットは `GET /api/chat`、問題集は `GET /api/quiz/store` など Web フロントと同じ API を使います。
+
+## 問題集（クイズ）
+
+ドロワーの「問題集」またはホームのカードから `/quiz` に入ります。大分類 → チャプター → 一問ずつ解答（単一／複数選択）→ 結果画面、という流れは Web の問題集に近い構成です。解答は `POST /api/quiz/answer` で記録され、ユーザー ID は `AsyncStorage` に保存した端末固有の値を使います。
+
 ## 起動
 
 ```bash

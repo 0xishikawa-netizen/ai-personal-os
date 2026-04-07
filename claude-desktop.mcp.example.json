@@ -5,8 +5,14 @@
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "/Users/あなたのユーザー名/developer/kairos"
+        "/Users/ishikawatatsuya/developer/kairos"
       ]
     }
+  },
+  "preferences": {
+    "coworkScheduledTasksEnabled": false,
+    "ccdScheduledTasksEnabled": false,
+    "sidebarMode": "chat",
+    "coworkWebSearchEnabled": true
   }
 }

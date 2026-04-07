@@ -1,11 +1,14 @@
 services:
+  # 既定では起動しない。DBeaver と同じ「ホストの Postgres（例: localhost:5432）」を .env の DB_URL で使う。
+  # 同梱 DB が欲しいときだけ: docker compose --profile bundled-db up -d
   db:
+    profiles:
+      - bundled-db
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
-    # ホストの 5432 が他プロジェクトとぶつかる場合があるため 5433 を公開（api→db は内部 5432 のまま）
     ports:
       - '5433:5432'
     healthcheck:
@@ -22,13 +25,11 @@ services:
     env_file: .env
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      # env_file の DB_URL と揃え、コンテナ間はサービス名 db で解決（専用ネットワーク必須）
-      DB_URL: jdbc:postgresql://db:5432/postgres
     ports:
       - '8080:8080'
-    depends_on:
-      db:
-        condition: service_healthy
+    # コンテナから Mac/Win のホスト Postgres へ（DBeaver の localhost:5432 と同じインスタンス）
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     networks:
       - internal
 

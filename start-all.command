@@ -10,13 +10,9 @@ if ! docker info &>/dev/null; then
   exit 1
 fi
 
-# Backend
+# Backend（restart だとイメージが古いまま → Flyway V5 などが jar に乗らないことがある）
 echo "▶ Backend starting..."
-if docker compose ps --status running | grep -q "api"; then
-  docker compose restart api
-else
-  docker compose up -d --build
-fi
+docker compose up -d --build api
 
 # Frontend
 echo "▶ Frontend starting..."
