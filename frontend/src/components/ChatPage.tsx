@@ -9,7 +9,8 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 // ─── 定数 ────────────────────────────────────────────────────────────────────
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080';
+/** ブラウザは同一オリジンのみ。Next の Route Handler が API_PROXY_URL 先へプロキシする。 */
+const CHAT_API_PREFIX = '/api/chat';
 
 // ─── 型定義 ───────────────────────────────────────────────────────────────────
 type Role = 'user' | 'ai';
@@ -386,7 +387,7 @@ export default function ChatPage() {
 
   // 履歴取得（失敗時は apiReachable を false に）
   useEffect(() => {
-    fetch(`${API_BASE}/api/chat/history`)
+    fetch(`${CHAT_API_PREFIX}/history`)
       .then((r) => {
         setApiReachable(true);
         return r.ok ? r.json() : [];
@@ -412,7 +413,7 @@ export default function ChatPage() {
     dispatch({ type: 'APPEND', payload: { role: 'user', content: text } });
     dispatch({ type: 'SET_LOADING', payload: true });
     try {
-      const res = await fetch(`${API_BASE}/api/chat?message=${encodeURIComponent(text)}`);
+      const res = await fetch(`${CHAT_API_PREFIX}?message=${encodeURIComponent(text)}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.text();
       dispatch({ type: 'APPEND', payload: { role: 'ai', content: data } });
@@ -437,7 +438,7 @@ export default function ChatPage() {
     closeMenu();
     try {
       const res = await fetch(
-        `${API_BASE}/api/chat?message=${encodeURIComponent(userMsg.content)}`,
+        `${CHAT_API_PREFIX}?message=${encodeURIComponent(userMsg.content)}`,
       );
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.text();
@@ -485,7 +486,9 @@ export default function ChatPage() {
             {apiReachable === false && (
               <div className="chat-empty__error-wrap">
                 <p className="chat-empty__error">
-                  バックエンドに接続できません。API ({API_BASE}) が起動しているか確認してください。
+                  バックエンドに接続できません。ローカルでは API（:8080）と{' '}
+                  <code>frontend/.env.local</code> の <code>API_PROXY_URL</code>、本番では Vercel の{' '}
+                  <code>API_PROXY_URL</code> を確認してください。
                 </p>
                 <p className="chat-empty__error-hint">
                   起動するにはプロジェクトルートで <code>docker compose up -d api</code>{' '}
@@ -496,7 +499,7 @@ export default function ChatPage() {
                   className="chat-empty__retry"
                   onClick={() => {
                     setApiReachable(null);
-                    fetch(`${API_BASE}/api/chat/history`)
+                    fetch(`${CHAT_API_PREFIX}/history`)
                       .then((r) => {
                         setApiReachable(true);
                         return r.ok ? r.json() : [];

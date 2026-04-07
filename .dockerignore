@@ -1,4 +1,3 @@
-cat > .dockerignore <<'EOF'
 # Node / frontend / mobile
 frontend/
 mobile/
@@ -18,6 +17,10 @@ build/
 .vscode/
 .DS_Store
 
+# シークレット（誤って COPY しない）
+.env
+.env.*
+!.env.example
+
 # logs
 *.log
-EOF
