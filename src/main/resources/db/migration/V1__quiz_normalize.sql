@@ -106,34 +106,42 @@ CREATE INDEX IF NOT EXISTS idx_log_user ON quiz_answer_log (user_id);
 CREATE INDEX IF NOT EXISTS idx_log_question ON quiz_answer_log (question_id);
 CREATE INDEX IF NOT EXISTS idx_log_user_date ON quiz_answer_log (user_id, answered_at DESC);
 
--- JSON カラムから quiz_choice へ移行（未移行かつ JSON ありのときのみ）
-INSERT INTO quiz_choice (id, question_id, label, body, image_url, is_correct)
-SELECT DISTINCT ON (q.id, lab)
-    'c-' || substr(md5(q.id || (elem ->> 'label')), 1, 32),
-    q.id,
-    lab::CHAR(1),
-    COALESCE(elem ->> 'text', ''),
-    NULL,
-    EXISTS (SELECT 1
-            FROM jsonb_array_elements_text(
-                         CASE
-                             WHEN q.answers_json IS NULL OR btrim(q.answers_json) = '' THEN '[]'::jsonb
-                             ELSE q.answers_json::jsonb END) AS ans(lbl)
-            WHERE upper(ans.lbl) = lab)
-FROM quiz_question q
-         CROSS JOIN LATERAL jsonb_array_elements(
-        CASE
-            WHEN q.choices_json IS NOT NULL AND btrim(q.choices_json) <> '' THEN q.choices_json::jsonb
-            ELSE '[]'::jsonb END
-        ) AS elem
-         CROSS JOIN LATERAL (SELECT upper(substr(trim(elem ->> 'label'), 1, 1)) AS lab) AS l
-WHERE EXISTS (SELECT 1
-              FROM information_schema.columns
-              WHERE table_name = 'quiz_question'
-                AND column_name = 'choices_json')
-  AND NOT EXISTS (SELECT 1 FROM quiz_choice c WHERE c.question_id = q.id)
-  AND lab IN ('A', 'B', 'C', 'D', 'E')
-ORDER BY q.id, lab;
+-- JSON カラムから quiz_choice へ移行（レガシー列がある DB のみ）
+-- 静的 INSERT だと WHERE で絞っても choices_json を解決できず新規環境で失敗するため EXECUTE で遅延パースする。
+DO $$
+    BEGIN
+        IF EXISTS (SELECT 1
+                   FROM information_schema.columns
+                   WHERE table_schema = current_schema()
+                     AND table_name = 'quiz_question'
+                     AND column_name = 'choices_json') THEN
+            EXECUTE $legacy_json_to_choice$
+                INSERT INTO quiz_choice (id, question_id, label, body, image_url, is_correct)
+                SELECT DISTINCT ON (q.id, lab)
+                    'c-' || substr(md5(q.id || (elem ->> 'label')), 1, 32),
+                    q.id,
+                    lab::CHAR(1),
+                    COALESCE(elem ->> 'text', ''),
+                    NULL,
+                    EXISTS (SELECT 1
+                            FROM jsonb_array_elements_text(
+                                         CASE
+                                             WHEN q.answers_json IS NULL OR btrim(q.answers_json) = '' THEN '[]'::jsonb
+                                             ELSE q.answers_json::jsonb END) AS ans(lbl)
+                            WHERE upper(ans.lbl) = lab)
+                FROM quiz_question q
+                         CROSS JOIN LATERAL jsonb_array_elements(
+                        CASE
+                            WHEN q.choices_json IS NOT NULL AND btrim(q.choices_json) <> '' THEN q.choices_json::jsonb
+                            ELSE '[]'::jsonb END
+                        ) AS elem
+                         CROSS JOIN LATERAL (SELECT upper(substr(trim(elem ->> 'label'), 1, 1)) AS lab) AS l
+                WHERE NOT EXISTS (SELECT 1 FROM quiz_choice c WHERE c.question_id = q.id)
+                  AND lab IN ('A', 'B', 'C', 'D', 'E')
+                ORDER BY q.id, lab
+                $legacy_json_to_choice$;
+        END IF;
+    END $$;
 
 -- question_type を正解数から補正
 UPDATE quiz_question q
@@ -145,7 +153,8 @@ SET question_type = CASE
                         ELSE 'single' END
 WHERE EXISTS (SELECT 1
               FROM information_schema.columns
-              WHERE table_name = 'quiz_question'
+              WHERE table_schema = current_schema()
+                AND table_name = 'quiz_question'
                 AND column_name = 'choices_json');
 
 ALTER TABLE quiz_question DROP COLUMN IF EXISTS choices_json;
