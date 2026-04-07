@@ -1,5 +1,5 @@
-import { QuizTakeClient } from '@/components/quiz/QuizTakeClient';
+import { QuizHomeClient } from '@/components/quiz/QuizHomeClient';
 
-export default function HttpQuizPage() {
-  return <QuizTakeClient />;
+export default function KairosQuizHomePage() {
+  return <QuizHomeClient />;
 }

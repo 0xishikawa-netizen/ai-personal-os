@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { AnswerRecord, QuizStore } from '@/lib/quiz/types';
+import type { AnswerRecord, QuizQuestion, QuizStore } from '@/lib/quiz/types';
+import { correctLabels } from '@/lib/quiz/types';
 import {
   getChaptersBySection,
   getQuestionsByChapter,
   getSectionForChapter,
   loadStore,
-} from '@/lib/quiz/storage';
+} from '@/lib/quiz';
 
 type Step = 'pick' | 'quiz' | 'results';
 
@@ -18,7 +19,7 @@ type CardState = {
   showExplain: boolean;
 };
 
-function labelsEqual(a: string[], b: string[]) {
+export function labelsEqual(a: string[], b: string[]) {
   if (a.length !== b.length) return false;
   const sa = [...a].sort();
   const sb = [...b].sort();
@@ -44,7 +45,7 @@ function GoldStars({ n }: { n: number }) {
   );
 }
 
-function QuestionCard({
+export function QuestionCard({
   q,
   displayId,
   state,
@@ -54,7 +55,7 @@ function QuestionCard({
   onSelectSingle,
   onShowExplain,
 }: {
-  q: import('@/lib/quiz/types').QuizQuestion;
+  q: QuizQuestion;
   displayId: string;
   state: CardState;
   isMulti: boolean;
@@ -63,7 +64,7 @@ function QuestionCard({
   onSelectSingle: (label: string) => void;
   onShowExplain: () => void;
 }) {
-  const correctSorted = useMemo(() => [...q.answers].sort(), [q.answers]);
+  const correctSorted = useMemo(() => correctLabels(q), [q]);
   const wrong =
     state.locked && !labelsEqual([...state.selected].sort(), correctSorted);
 
@@ -76,7 +77,13 @@ function QuestionCard({
         <span className="text-[15px] font-medium text-[var(--quiz-accent-soft)]">問題 {displayId}</span>
         <GoldStars n={q.difficulty} />
       </div>
-      <p className="mb-5 text-[16px] leading-relaxed text-[var(--foreground)]">{q.question}</p>
+      <p className="mb-5 text-[16px] leading-relaxed text-[var(--foreground)]">{q.body}</p>
+      {q.imageUrl ? (
+        <div className="mb-5 overflow-hidden rounded-xl border border-[var(--quiz-card-border)]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={q.imageUrl} alt="" className="max-h-64 w-full object-contain bg-black/20" />
+        </div>
+      ) : null}
       {isMulti && !state.locked && (
         <p className="mb-3 text-[13px] text-[var(--quiz-muted)]">
           複数正解です。該当するものをすべて選び、「回答する」で確定してください。
@@ -85,10 +92,10 @@ function QuestionCard({
       <ul className="space-y-2.5">
         {q.choices.map((ch) => {
           const picked = state.selected.includes(ch.label);
-          const isCorrectChoice = q.answers.includes(ch.label);
+          const isCorrectChoice = correctLabels(q).includes(ch.label);
           let border = 'border border-[var(--quiz-card-border)]';
           let labelCls = 'text-[var(--quiz-accent-soft)]';
-          let textCls = 'text-[var(--foreground)]/95';
+          const textCls = 'text-[var(--foreground)]/95';
 
           if (!state.locked && isMulti && picked) {
             border = 'border-2 border-[var(--accent)]';
@@ -120,7 +127,7 @@ function QuestionCard({
                 className={`w-full rounded-[10px] px-4 py-3.5 text-left text-[15px] transition-colors ${border} bg-[var(--quiz-choice-bg)] hover:bg-white/[0.04] disabled:cursor-default`}
               >
                 <span className={`font-bold ${labelCls}`}>{ch.label}.</span>{' '}
-                <span className={textCls}>{ch.text}</span>
+                <span className={textCls}>{ch.body}</span>
               </button>
             </li>
           );
@@ -312,13 +319,13 @@ export function QuizTakeClient() {
   const onSelectSingle = useCallback(
     (qid: string, label: string) => {
       const q = questions.find((x) => x.id === qid);
-      if (!q || q.answers.length > 1) return;
+      if (!q || correctLabels(q).length > 1) return;
       const selected = [label];
       setCards((prev) => ({
         ...prev,
         [qid]: { ...prev[qid], selected, locked: true },
       }));
-      const ok = labelsEqual(selected, q.answers);
+      const ok = labelsEqual(selected, correctLabels(q));
       setRecords((prev) => {
         const rest = prev.filter((r) => r.questionId !== qid);
         return [...rest, { questionId: qid, selected, correct: ok }];
@@ -341,13 +348,13 @@ export function QuizTakeClient() {
   const onConfirmMulti = useCallback(
     (qid: string) => {
       const q = questions.find((x) => x.id === qid);
-      if (!q || q.answers.length <= 1) return;
+      if (!q || correctLabels(q).length <= 1) return;
       setCards((prev) => {
         const cur = prev[qid];
         if (!cur || cur.locked) return prev;
         const selected = cur.selected;
         if (selected.length === 0) return prev;
-        const ok = labelsEqual(selected, q.answers);
+        const ok = labelsEqual(selected, correctLabels(q));
         setRecords((rprev) => {
           const rest = rprev.filter((r) => r.questionId !== qid);
           return [...rest, { questionId: qid, selected: [...selected].sort(), correct: ok }];
@@ -465,7 +472,7 @@ export function QuizTakeClient() {
 
           <div className="mt-6 min-h-0 flex-1 space-y-6 overflow-y-auto pr-0.5">
             {questions.map((q, i) => {
-              const isMulti = q.answers.length > 1;
+              const isMulti = q.questionType === 'multiple' || correctLabels(q).length > 1;
               return (
                 <QuestionCard
                   key={q.id}

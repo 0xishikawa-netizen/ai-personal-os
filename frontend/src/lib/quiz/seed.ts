@@ -1,6 +1,6 @@
 import type { QuizStore } from './types';
 
-/** 初回サンプル（HTTP など）— 任意ジャンルに差し替え可能 */
+/** 初回サンプル（ローカルデモ用）— 本番データは API / DB */
 export const seedQuizStore: QuizStore = {
   sections: [
     { id: 'sec-net', name: 'ネットワーク', description: 'HTTP / TLS など', order: 0 },
@@ -14,48 +14,51 @@ export const seedQuizStore: QuizStore = {
     {
       id: 'q-1-1',
       chapterId: 'ch-http-1',
-      question: 'HTTP/1.1 で、クライアントとサーバーが一度に確立する接続の最大数は（同一オリジン）理論上は？',
+      body: 'HTTP/1.1 で、クライアントとサーバーが一度に確立する接続の最大数は（同一オリジン）理論上は？',
       choices: [
-        { label: 'A', text: '1 接続のみ' },
-        { label: 'B', text: '仕様上は複数パイプライン可能（実装依存）' },
-        { label: 'C', text: '無制限' },
-        { label: 'D', text: '常に 6 接続のみ' },
-        { label: 'E', text: 'HTTPS では 0' },
+        { id: 'c-a1', label: 'A', body: '1 接続のみ', isCorrect: false },
+        { id: 'c-b1', label: 'B', body: '仕様上は複数パイプライン可能（実装依存）', isCorrect: true },
+        { id: 'c-c1', label: 'C', body: '無制限', isCorrect: false },
+        { id: 'c-d1', label: 'D', body: '常に 6 接続のみ', isCorrect: false },
+        { id: 'c-e1', label: 'E', body: 'HTTPS では 0', isCorrect: false },
       ],
-      answers: ['B'],
       explanation:
         'HTTP/1.1 で同一オリジンあたりの同時接続数はブラウザ実装で制限されることが多いですが、仕様上パイプライン等で複数リクエストを扱う設計があります（問題は「学習用の例」です）。',
       difficulty: 2,
+      questionType: 'single',
+      sortOrder: 0,
     },
     {
       id: 'q-1-2',
       chapterId: 'ch-http-1',
-      question: 'ステータスコード 404 は何を意味する？',
+      body: 'ステータスコード 404 は何を意味する？',
       choices: [
-        { label: 'A', text: 'サーバーエラー' },
-        { label: 'B', text: 'リダイレクト' },
-        { label: 'C', text: '認証が必要' },
-        { label: 'D', text: 'リソースが見つからない' },
-        { label: 'E', text: '成功' },
+        { id: 'c-a2', label: 'A', body: 'サーバーエラー', isCorrect: false },
+        { id: 'c-b2', label: 'B', body: 'リダイレクト', isCorrect: false },
+        { id: 'c-c2', label: 'C', body: '認証が必要', isCorrect: false },
+        { id: 'c-d2', label: 'D', body: 'リソースが見つからない', isCorrect: true },
+        { id: 'c-e2', label: 'E', body: '成功', isCorrect: false },
       ],
-      answers: ['D'],
       explanation: '404 Not Found は要求されたリソースがサーバーに存在しないことを示します。',
       difficulty: 1,
+      questionType: 'single',
+      sortOrder: 1,
     },
     {
       id: 'q-2-1',
       chapterId: 'ch-http-2',
-      question: 'REST でリソースの新規作成に使うことが多い HTTP メソッドは？',
+      body: 'REST でリソースの新規作成に使うことが多い HTTP メソッドは？',
       choices: [
-        { label: 'A', text: 'GET' },
-        { label: 'B', text: 'POST' },
-        { label: 'C', text: 'HEAD' },
-        { label: 'D', text: 'TRACE' },
-        { label: 'E', text: 'OPTIONS' },
+        { id: 'c-a3', label: 'A', body: 'GET', isCorrect: false },
+        { id: 'c-b3', label: 'B', body: 'POST', isCorrect: true },
+        { id: 'c-c3', label: 'C', body: 'HEAD', isCorrect: false },
+        { id: 'c-d3', label: 'D', body: 'TRACE', isCorrect: false },
+        { id: 'c-e3', label: 'E', body: 'OPTIONS', isCorrect: false },
       ],
-      answers: ['B'],
       explanation: 'POST はエンティティの作成や処理のトリガーに広く使われます（設計により PUT も）。',
       difficulty: 2,
+      questionType: 'single',
+      sortOrder: 0,
     },
   ],
 };
