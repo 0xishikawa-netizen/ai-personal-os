@@ -1,5 +1,6 @@
-package com.kairos.quiz;
+package com.kairos.quiz.repository;
 
+import com.kairos.quiz.domain.QuizSectionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

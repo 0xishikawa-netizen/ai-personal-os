@@ -6,7 +6,8 @@ import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
- * quiz 配下の {@code @Entity} / Repository を確実に拾うため、スキャン範囲を明示。
+ * {@code com.kairos} 配下の {@code @Entity}（例: {@code com.kairos.quiz.domain}）と
+ * Repository を確実に拾うため、スキャン範囲を明示。
  */
 @SpringBootApplication
 @EntityScan(basePackages = "com.kairos")

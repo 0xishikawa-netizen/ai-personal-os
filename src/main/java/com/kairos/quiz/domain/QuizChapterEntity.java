@@ -1,4 +1,4 @@
-package com.kairos.quiz;
+package com.kairos.quiz.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,6 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * セクション配下の章。テーブル {@code quiz_chapter}。
+ */
 @Entity
 @Table(name = "quiz_chapter")
 @Getter
@@ -22,6 +25,7 @@ public class QuizChapterEntity {
 	@Column(name = "section_id", length = 64, nullable = false)
 	private String sectionId;
 
+	@Column(length = 512, nullable = false)
 	private String title;
 
 	@Column(name = "sort_order", nullable = false)

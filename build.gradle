@@ -30,7 +30,6 @@ dependencies {
 
     // Web/API
     implementation "org.springframework.boot:spring-boot-starter-web"
-    // Quiz 等が com.fasterxml.jackson.databind.ObjectMapper を使うため（Boot 4 既定は Jackson 3 の JsonMapper）
     implementation "org.springframework.boot:spring-boot-jackson2"
 
     // JPA
@@ -64,6 +63,15 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs.add('-parameters')
+}
+
 springBoot {
     mainClass = 'com.kairos.KairosApplication'
+}
+
+// Docker 最終ステージでワイルドカード COPY すると BuildKit で空レイヤーになることがあるため固定名にする
+tasks.named('bootJar') {
+    archiveFileName = 'kairos-boot.jar'
 }
